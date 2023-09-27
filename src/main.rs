@@ -12,10 +12,7 @@ use std::{
     fs,
     io
 };
-use std::f32::consts::PI;
-use std::ffi::c_float;
 use rand::Rng;
-use rand::rngs::mock::StepRng;
 use shuffle::shuffler::Shuffler;
 use shuffle::irs::Irs;
 use std::{thread, time};
@@ -49,7 +46,7 @@ fn main() -> io::Result<()> {
     let path: String = std::format!("./data/users/{}/scores/{}.txt", unsafe { &USER_NAME }, chrono::offset::Local::now().to_string().trim().replace(" ", "_").replace(":", "--"));
     let mut file: File = File::create(&path)?;
     unsafe {
-        file.write_all(SESSION_SCORE.to_string().as_ref());
+        file.write_all(SESSION_SCORE.to_string().as_ref()).expect("tomfoolery");
         println!("Your final score is : {}\n", SESSION_SCORE)
     }
 
@@ -194,7 +191,7 @@ fn play_game() {
     match str.trim().to_lowercase().as_str() {
         "a" => unsafe {play_circle()}
         "b" => unsafe {play_rectangle()}
-        "c" => {}
+        "c" => unsafe {play_triangle()}
         "quit" => { return;}
         _ => {play_game();return;}
     }
@@ -208,13 +205,13 @@ unsafe fn play_circle() {
     let mut stdout = stdout();
     print!("{esc}c", esc = 27 as char);
     let num: u32 = rand::thread_rng().gen_range(6..20);
-    let mut correct_answer : f32 = get_circle_area(num);
+    let correct_answer : f32 = get_circle_area(num);
     let mut answers : Vec<f32> = vec![correct_answer, correct_answer - 10.0, correct_answer -4.3, correct_answer + 5.2];
 
     let mut rng = rand::thread_rng();
     let mut irs = Irs::default();
 
-    irs.shuffle(&mut answers, &mut rng);
+    irs.shuffle(&mut answers, &mut rng).expect("tomfoolery");
 
     println!(r#"{}
     Radius = {}
@@ -253,7 +250,7 @@ unsafe fn play_circle() {
 }
 
 fn get_rectangle_area(width : u32, length : u32) -> u32 {
-    return (width * length)
+    return width * length
 }
 
 unsafe fn play_rectangle() {
@@ -261,13 +258,13 @@ unsafe fn play_rectangle() {
     print!("{esc}c", esc = 27 as char);
     let length: u32 = rand::thread_rng().gen_range(6..20);
     let width: u32 = rand::thread_rng().gen_range(6..20);
-    let mut correct_answer : u32 = get_rectangle_area(length, width);
+    let correct_answer : u32 = get_rectangle_area(length, width);
     let mut answers : Vec<u32> = vec![correct_answer, correct_answer - 4, correct_answer -3, correct_answer + 6];
 
     let mut rng = rand::thread_rng();
     let mut irs = Irs::default();
 
-    irs.shuffle(&mut answers, &mut rng);
+    irs.shuffle(&mut answers, &mut rng).expect("tomfoolery");
 
     println!(r#"{}
     length = {}
@@ -305,7 +302,7 @@ unsafe fn play_rectangle() {
 }
 
 fn get_triangle_area(base : u32, height : u32) -> f32 {
-    return 0.5 * (base as f32, height as f32)
+    return (base as f32 * height as f32) * (0.5)
 }
 
 unsafe fn play_triangle() {
@@ -313,13 +310,13 @@ unsafe fn play_triangle() {
     print!("{esc}c", esc = 27 as char);
     let base: u32 = rand::thread_rng().gen_range(6..20);
     let height: u32 = rand::thread_rng().gen_range(6..20);
-    let mut correct_answer : f32 = get_triangle_area(base, height);
+    let correct_answer : f32 = get_triangle_area(base, height);
     let mut answers : Vec<f32> = vec![correct_answer, correct_answer - 3.8, correct_answer +2.3, correct_answer + 5.3];
 
     let mut rng = rand::thread_rng();
     let mut irs = Irs::default();
 
-    irs.shuffle(&mut answers, &mut rng);
+    irs.shuffle(&mut answers, &mut rng).expect("tomfoolery");
 
     println!(r#"{}
     base = {}
@@ -358,7 +355,7 @@ unsafe fn play_triangle() {
 
 fn abcd_to_0123() -> usize {
     let mut str : String = String::new();
-    let mut ind : usize = 0;
+    let ind : usize;
     io::stdin()
         .read_line(&mut str)
         .expect("brokey");
