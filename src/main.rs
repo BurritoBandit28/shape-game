@@ -259,9 +259,9 @@ fn get_rectangle_area(width : u32, length : u32) -> u32 {
 unsafe fn play_rectangle() {
     let mut stdout = stdout();
     print!("{esc}c", esc = 27 as char);
-    let num: u32 = rand::thread_rng().gen_range(6..20);
-    let num2: u32 = rand::thread_rng().gen_range(6..20);
-    let mut correct_answer : u32 = get_rectangle_area(num, num2);
+    let length: u32 = rand::thread_rng().gen_range(6..20);
+    let width: u32 = rand::thread_rng().gen_range(6..20);
+    let mut correct_answer : u32 = get_rectangle_area(length, width);
     let mut answers : Vec<u32> = vec![correct_answer, correct_answer - 4, correct_answer -3, correct_answer + 6];
 
     let mut rng = rand::thread_rng();
@@ -274,7 +274,59 @@ unsafe fn play_rectangle() {
     width = {}
 
     | A: {:.2} | B: {:.2} | C: {:.2} | D: {:.2} |
-    Enter your answer."#, rectangle(), &num, &num2, &answers[0],&answers[1],&answers[2],&answers[3]);
+    Enter your answer."#, rectangle(), &length, &width, &answers[0], &answers[1], &answers[2], &answers[3]);
+
+    if answers[abcd_to_0123()].eq(&correct_answer) {
+        println!("Correct! +2 points!");
+        SESSION_SCORE +=2;
+        thread::sleep(time::Duration::from_secs(3u64));
+        play_game();
+        return;
+    }
+    else {
+        println!("wrong please enter again");
+        thread::sleep(time::Duration::from_secs(1u64));
+        stdout.execute(cursor::MoveUp(2)).expect("tweedle dum");
+        stdout.execute(terminal::Clear(terminal::ClearType::FromCursorDown)).expect("tweedle doo");
+        if answers[abcd_to_0123()].eq(&correct_answer) {
+            println!("Correct! +1 points!");
+            SESSION_SCORE +=1;
+            thread::sleep(time::Duration::from_secs(3u64));
+            play_game();
+            return;
+        }
+        else {
+            println!("wrong, you suck");
+            thread::sleep(time::Duration::from_secs(3u64));
+            play_game();
+            return;
+        }
+    }
+}
+
+fn get_triangle_area(base : u32, height : u32) -> f32 {
+    return 0.5 * (base as f32, height as f32)
+}
+
+unsafe fn play_triangle() {
+    let mut stdout = stdout();
+    print!("{esc}c", esc = 27 as char);
+    let base: u32 = rand::thread_rng().gen_range(6..20);
+    let height: u32 = rand::thread_rng().gen_range(6..20);
+    let mut correct_answer : f32 = get_triangle_area(base, height);
+    let mut answers : Vec<f32> = vec![correct_answer, correct_answer - 3.8, correct_answer +2.3, correct_answer + 5.3];
+
+    let mut rng = rand::thread_rng();
+    let mut irs = Irs::default();
+
+    irs.shuffle(&mut answers, &mut rng);
+
+    println!(r#"{}
+    base = {}
+    height = {}
+
+    | A: {:.2} | B: {:.2} | C: {:.2} | D: {:.2} |
+    Enter your answer."#, triangle(), &base, &height, &answers[0], &answers[1], &answers[2], &answers[3]);
 
     if answers[abcd_to_0123()].eq(&correct_answer) {
         println!("Correct! +2 points!");
