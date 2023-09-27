@@ -244,7 +244,7 @@ unsafe fn play_circle() {
             return;
         }
         else {
-            println!("wrong, you suck");
+            println!("wrong, you suck, correct is {}", correct_answer);
             thread::sleep(time::Duration::from_secs(3u64));
             play_game();
             return;
@@ -296,7 +296,7 @@ unsafe fn play_rectangle() {
             return;
         }
         else {
-            println!("wrong, you suck");
+            println!("wrong, you suck, correct is {}", correct_answer);
             thread::sleep(time::Duration::from_secs(3u64));
             play_game();
             return;
@@ -348,7 +348,7 @@ unsafe fn play_triangle() {
             return;
         }
         else {
-            println!("wrong, you suck");
+            println!("wrong, you suck, correct is {}", correct_answer);
             thread::sleep(time::Duration::from_secs(3u64));
             play_game();
             return;
