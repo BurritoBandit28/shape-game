@@ -27,8 +27,11 @@ pub static mut SESSION_SCORE : u32 = 0;
 
 fn main() -> io::Result<()> {
     let mut stdout = stdout();
+
+    //create data directory
     fs::create_dir_all("./data/users/").expect(PANIC_MESSAGE);
 
+    //ask user for login or sign up
     println!("Login or sign up");
     let mut lgnsn: String = String::new();
     io::stdin().read_line(&mut lgnsn).expect(PANIC_MESSAGE);
@@ -40,16 +43,19 @@ fn main() -> io::Result<()> {
         unsafe { login().expect(PANIC_MESSAGE) }
     }
 
+    //clear console and save session score
     print!("{esc}c", esc = 27 as char);
     fs::create_dir_all(std::format!("./data/users/{}/scores/", unsafe { &USER_NAME })).expect(PANIC_MESSAGE);
-
+                                                                                                                                                   //file system doesn't allow ":", so replace with "--"                     
     let path: String = std::format!("./data/users/{}/scores/{}.txt", unsafe { &USER_NAME }, chrono::offset::Local::now().to_string().trim().replace(" ", "_").replace(":", "--"));
     let mut file: File = File::create(&path)?;
     unsafe {
+        //writing session score to file
         file.write_all(SESSION_SCORE.to_string().as_ref()).expect("tomfoolery");
         println!("Your final score is : {}\n", SESSION_SCORE)
     }
 
+    //ask to view previous scores
     println!("View previous scores? (y/n)");
     let mut ps : String = String::new();
     io::stdin()
@@ -59,6 +65,8 @@ fn main() -> io::Result<()> {
         stdout.execute(cursor::MoveUp(1)).expect("tweedle dum");
         stdout.execute(terminal::Clear(terminal::ClearType::FromCursorDown)).expect("tweedle doo");
         let mut scores : Vec<usize> = vec![];
+        
+        //create an iterator of all the paths within the scores folder of the user data
         let paths = fs::read_dir(std::format!("./data/users/{}/scores/", unsafe { &USER_NAME })).unwrap();
         for path  in paths {
             let mut score : String = String::new();
@@ -68,6 +76,7 @@ fn main() -> io::Result<()> {
             buf_reader.read_to_string(&mut score)?;
             scores.append(&mut vec!(usize::from_str(&*score).unwrap()))
         }
+        // sort scores with highest scores first
         scores.sort();
         scores.reverse();
         for x in scores{
